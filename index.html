@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Computing Engine v1.0</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+    <style>
+        :root { --bg: #0f172a; --panel: #1e293b; --accent: #38bdf8; --text: #f8fafc; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .calc-container { background: var(--panel); padding: 2rem; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 400px; }
+        #screen { width: 100%; height: 60px; background: #000; border: none; color: var(--accent); font-family: 'Fira Code', monospace; text-align: right; font-size: 1.5rem; padding: 10px; box-sizing: border-box; margin-bottom: 1rem; border-radius: 0.5rem; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        button { padding: 15px; border: none; border-radius: 0.5rem; background: #334155; color: white; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+        button:hover { background: #475569; }
+        .btn-op { background: #0ea5e9; }
+        .btn-sci { background: #64748b; font-size: 0.8rem; }
+        .btn-equal { grid-column: span 2; background: #10b981; }
+    </style>
+</head>
+<body>
+
+<div class="calc-container">
+    <input type="text" id="screen" readonly placeholder="0">
+    <div class="grid">
+        <button class="btn-sci" onclick="append('sin(')">sin</button>
+        <button class="btn-sci" onclick="append('cos(')">cos</button>
+        <button class="btn-sci" onclick="append('log(')">log</button>
+        <button class="btn-sci" onclick="append('sqrt(')">√</button>
+        
+        <button onclick="append('7')">7</button>
+        <button onclick="append('8')">8</button>
+        <button onclick="append('9')">9</button>
+        <button class="btn-op" onclick="clearScreen()">AC</button>
+        
+        <button onclick="append('4')">4</button>
+        <button onclick="append('5')">5</button>
+        <button onclick="append('6')">6</button>
+        <button class="btn-op" onclick="append('*')">×</button>
+        
+        <button onclick="append('1')">1</button>
+        <button onclick="append('2')">2</button>
+        <button onclick="append('3')">3</button>
+        <button class="btn-op" onclick="append('/')">÷</button>
+        
+        <button onclick="append('0')">0</button>
+        <button onclick="append('.')">.</button>
+        <button onclick="append('pi')">π</button>
+        <button class="btn-op" onclick="append('+')">+</button>
+        
+        <button onclick="append('(')">(</button>
+        <button onclick="append(')')">)</button>
+        <button class="btn-equal" onclick="compute()">=</button>
+    </div>
+</div>
+
+<script>
+    const screen = document.getElementById('screen');
+
+    function append(val) {
+        screen.value += val;
+    }
+
+    function clearScreen() {
+        screen.value = '';
+    }
+
+    function compute() {
+        try {
+            // El motor math.js procesa la cadena como una expresión simbólica
+            const result = math.evaluate(screen.value);
+            screen.value = math.format(result, { precision: 14 });
+        } catch (error) {
+            screen.value = "Syntax Error";
+            setTimeout(clearScreen, 1500);
+        }
+    }
+</script>
+
+</body>
+</html>
