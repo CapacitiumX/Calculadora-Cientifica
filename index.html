@@ -3,167 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SciCompute Pro | PWA</title>
+    <title>Scientific Computing Pro</title>
+
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Scientific Calculator","short_name":"SciCalc","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#0ea5e9","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/5348/5348365.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
     
-    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5348/5348365.png">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
 
     <style>
-        :root { 
-            --bg: #0f172a; 
-            --panel: #1e293b; 
-            --accent: #38bdf8; 
-            --text: #f8fafc; 
-            --op: #0ea5e9;
-            --equal: #10b981;
-        }
-
-        body { 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            overflow: hidden;
-        }
-
-        .calc-container { 
-            background: var(--panel); 
-            padding: 1.5rem; 
-            border-radius: 1.5rem; 
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); 
-            width: 90%; 
-            max-width: 380px; 
-        }
-
-        #display { 
-            width: 100%; 
-            height: 80px; 
-            background: rgba(0,0,0,0.3); 
-            border: none; 
-            color: var(--accent); 
-            font-family: 'Consolas', monospace; 
-            text-align: right; 
-            font-size: 1.8rem; 
-            padding: 15px; 
-            box-sizing: border-box; 
-            margin-bottom: 1.5rem; 
-            border-radius: 0.75rem;
-            outline: none;
-        }
-
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 12px; 
-        }
-
-        button { 
-            padding: 18px 5px; 
-            border: none; 
-            border-radius: 0.75rem; 
-            background: #334155; 
-            color: white; 
-            cursor: pointer; 
-            font-size: 1rem;
-            font-weight: 600; 
-            transition: transform 0.1s, background 0.2s; 
-            user-select: none;
-        }
-
-        button:active { transform: scale(0.95); }
-        button:hover { background: #475569; }
-
+        :root { --bg: #0f172a; --panel: #1e293b; --accent: #38bdf8; --text: #f8fafc; --op: #0ea5e9; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        
+        .calc-app { background: var(--panel); padding: 1.5rem; border-radius: 2rem; width: 100%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
+        
+        #display { width: 100%; height: 90px; background: rgba(0,0,0,0.3); border: none; color: var(--accent); font-family: 'Consolas', monospace; text-align: right; font-size: 2.2rem; padding: 1rem; margin-bottom: 1.5rem; border-radius: 1rem; outline: none; }
+        
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        
+        button { padding: 20px 5px; border: none; border-radius: 1rem; background: #334155; color: white; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.1s ease; }
+        button:active { transform: scale(0.92); background: #475569; }
+        
+        .btn-sci { background: #1e293b; color: var(--accent); font-size: 0.9rem; border: 1px solid rgba(56, 189, 248, 0.2); }
         .btn-op { background: var(--op); }
-        .btn-sci { background: #475569; font-size: 0.85rem; color: var(--accent); }
-        .btn-equal { grid-column: span 2; background: var(--equal); }
-        .btn-clear { background: #ef4444; }
-
-        @media (max-width: 350px) {
-            .calc-container { padding: 1rem; }
-            button { padding: 15px 5px; }
-        }
+        .btn-eq { background: #10b981; grid-column: span 2; }
+        .btn-ac { background: #ef4444; }
     </style>
 </head>
 <body>
 
-<div class="calc-container">
+<div class="calc-app">
     <input type="text" id="display" readonly placeholder="0">
-    <div class="grid" id="keypad">
-        <button class="btn-sci" onclick="add('sin(')">sin</button>
-        <button class="btn-sci" onclick="add('cos(')">cos</button>
-        <button class="btn-sci" onclick="add('tan(')">tan</button>
-        <button class="btn-sci" onclick="add('sqrt(')">√</button>
+    <div class="grid">
+        <button class="btn-sci" onclick="ins('sin(')">sin</button>
+        <button class="btn-sci" onclick="ins('cos(')">cos</button>
+        <button class="btn-sci" onclick="ins('tan(')">tan</button>
+        <button class="btn-sci" onclick="ins('sqrt(')">√</button>
+        
+        <button class="btn-sci" onclick="ins('log(')">log</button>
+        <button class="btn-sci" onclick="ins('^')">xʸ</button>
+        <button class="btn-sci" onclick="ins('pi')">π</button>
+        <button class="btn-ac" onclick="clr()">AC</button>
+        
+        <button onclick="ins('7')">7</button>
+        <button onclick="ins('8')">8</button>
+        <button onclick="ins('9')">9</button>
+        <button class="btn-op" onclick="ins('*')">×</button>
+        
+        <button onclick="ins('4')">4</button>
+        <button onclick="ins('5')">5</button>
+        <button onclick="ins('6')">6</button>
+        <button class="btn-op" onclick="ins('/')">÷</button>
+        
+        <button onclick="ins('1')">1</button>
+        <button onclick="ins('2')">2</button>
+        <button onclick="ins('3')">3</button>
+        <button class="btn-op" onclick="ins('+')">+</button>
+        
+        <button onclick="ins('0')">0</button>
+        <button onclick="ins('.')">.</button>
+        <button class="btn-op" onclick="ins('-')">−</button>
+        <button class="btn-op" onclick="ins('(')">(</button>
 
-        <button class="btn-sci" onclick="add('log(')">log</button>
-        <button class="btn-sci" onclick="add('exp(')">exp</button>
-        <button class="btn-sci" onclick="add('^')">xʸ</button>
-        <button class="btn-sci" onclick="add('pi')">π</button>
-        
-        <button onclick="add('7')">7</button>
-        <button onclick="add('8')">8</button>
-        <button onclick="add('9')">9</button>
-        <button class="btn-clear" onclick="clearDisplay()">AC</button>
-        
-        <button onclick="add('4')">4</button>
-        <button onclick="add('5')">5</button>
-        <button onclick="add('6')">6</button>
-        <button class="btn-op" onclick="add('*')">×</button>
-        
-        <button onclick="add('1')">1</button>
-        <button onclick="add('2')">2</button>
-        <button onclick="add('3')">3</button>
-        <button class="btn-op" onclick="add('/')">÷</button>
-        
-        <button onclick="add('0')">0</button>
-        <button onclick="add('.')">.</button>
-        <button onclick="add('(')">(</button>
-        <button onclick="add(')')">)</button>
-
-        <button class="btn-op" onclick="add('+')">+</button>
-        <button class="btn-op" onclick="add('-')">−</button>
-        <button class="btn-equal" onclick="calculate()">=</button>
+        <button onclick="ins(')')">)</button>
+        <button class="btn-eq" onclick="solve()">=</button>
     </div>
 </div>
 
 <script>
-    const display = document.getElementById('display');
-
-    function add(value) {
-        display.value += value;
-        display.scrollLeft = display.scrollWidth;
-    }
-
-    function clearDisplay() {
-        display.value = '';
-    }
-
-    function calculate() {
+    const out = document.getElementById('display');
+    function ins(v) { out.value += v; }
+    function clr() { out.value = ''; }
+    function solve() {
         try {
-            const result = math.evaluate(display.value);
-            // Formateo para evitar errores de coma flotante IEEE 754
-            display.value = math.format(result, { precision: 12 });
+            const r = math.evaluate(out.value);
+            out.value = math.format(r, { precision: 12 });
         } catch (e) {
-            display.value = "Error de Sintaxis";
-            setTimeout(clearDisplay, 1200);
+            out.value = "SYNTAX ERROR";
+            setTimeout(clr, 1500);
         }
     }
 
-    // Registro del Service Worker para PWA
+    // Lógica del Service Worker integrada mediante Blob
+    const swCode = `
+        self.addEventListener('install', e => self.skipWaiting());
+        self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));
+    `;
+    const blob = new Blob([swCode], { type: 'text/javascript' });
+    const swUrl = URL.createObjectURL(blob);
+
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Engine: Activo'))
-                .catch(err => console.error('Engine: Fallo', err));
-        });
+        navigator.serviceWorker.register(swUrl).then(() => console.log("PWA Engine Ready"));
     }
 </script>
 </body>
