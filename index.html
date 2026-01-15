@@ -2,80 +2,169 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scientific Computing Engine v1.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SciCompute Pro | PWA</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5348/5348365.png">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+
     <style>
-        :root { --bg: #0f172a; --panel: #1e293b; --accent: #38bdf8; --text: #f8fafc; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .calc-container { background: var(--panel); padding: 2rem; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 400px; }
-        #screen { width: 100%; height: 60px; background: #000; border: none; color: var(--accent); font-family: 'Fira Code', monospace; text-align: right; font-size: 1.5rem; padding: 10px; box-sizing: border-box; margin-bottom: 1rem; border-radius: 0.5rem; }
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        button { padding: 15px; border: none; border-radius: 0.5rem; background: #334155; color: white; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+        :root { 
+            --bg: #0f172a; 
+            --panel: #1e293b; 
+            --accent: #38bdf8; 
+            --text: #f8fafc; 
+            --op: #0ea5e9;
+            --equal: #10b981;
+        }
+
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            overflow: hidden;
+        }
+
+        .calc-container { 
+            background: var(--panel); 
+            padding: 1.5rem; 
+            border-radius: 1.5rem; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); 
+            width: 90%; 
+            max-width: 380px; 
+        }
+
+        #display { 
+            width: 100%; 
+            height: 80px; 
+            background: rgba(0,0,0,0.3); 
+            border: none; 
+            color: var(--accent); 
+            font-family: 'Consolas', monospace; 
+            text-align: right; 
+            font-size: 1.8rem; 
+            padding: 15px; 
+            box-sizing: border-box; 
+            margin-bottom: 1.5rem; 
+            border-radius: 0.75rem;
+            outline: none;
+        }
+
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 12px; 
+        }
+
+        button { 
+            padding: 18px 5px; 
+            border: none; 
+            border-radius: 0.75rem; 
+            background: #334155; 
+            color: white; 
+            cursor: pointer; 
+            font-size: 1rem;
+            font-weight: 600; 
+            transition: transform 0.1s, background 0.2s; 
+            user-select: none;
+        }
+
+        button:active { transform: scale(0.95); }
         button:hover { background: #475569; }
-        .btn-op { background: #0ea5e9; }
-        .btn-sci { background: #64748b; font-size: 0.8rem; }
-        .btn-equal { grid-column: span 2; background: #10b981; }
+
+        .btn-op { background: var(--op); }
+        .btn-sci { background: #475569; font-size: 0.85rem; color: var(--accent); }
+        .btn-equal { grid-column: span 2; background: var(--equal); }
+        .btn-clear { background: #ef4444; }
+
+        @media (max-width: 350px) {
+            .calc-container { padding: 1rem; }
+            button { padding: 15px 5px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="calc-container">
-    <input type="text" id="screen" readonly placeholder="0">
-    <div class="grid">
-        <button class="btn-sci" onclick="append('sin(')">sin</button>
-        <button class="btn-sci" onclick="append('cos(')">cos</button>
-        <button class="btn-sci" onclick="append('log(')">log</button>
-        <button class="btn-sci" onclick="append('sqrt(')">√</button>
+    <input type="text" id="display" readonly placeholder="0">
+    <div class="grid" id="keypad">
+        <button class="btn-sci" onclick="add('sin(')">sin</button>
+        <button class="btn-sci" onclick="add('cos(')">cos</button>
+        <button class="btn-sci" onclick="add('tan(')">tan</button>
+        <button class="btn-sci" onclick="add('sqrt(')">√</button>
+
+        <button class="btn-sci" onclick="add('log(')">log</button>
+        <button class="btn-sci" onclick="add('exp(')">exp</button>
+        <button class="btn-sci" onclick="add('^')">xʸ</button>
+        <button class="btn-sci" onclick="add('pi')">π</button>
         
-        <button onclick="append('7')">7</button>
-        <button onclick="append('8')">8</button>
-        <button onclick="append('9')">9</button>
-        <button class="btn-op" onclick="clearScreen()">AC</button>
+        <button onclick="add('7')">7</button>
+        <button onclick="add('8')">8</button>
+        <button onclick="add('9')">9</button>
+        <button class="btn-clear" onclick="clearDisplay()">AC</button>
         
-        <button onclick="append('4')">4</button>
-        <button onclick="append('5')">5</button>
-        <button onclick="append('6')">6</button>
-        <button class="btn-op" onclick="append('*')">×</button>
+        <button onclick="add('4')">4</button>
+        <button onclick="add('5')">5</button>
+        <button onclick="add('6')">6</button>
+        <button class="btn-op" onclick="add('*')">×</button>
         
-        <button onclick="append('1')">1</button>
-        <button onclick="append('2')">2</button>
-        <button onclick="append('3')">3</button>
-        <button class="btn-op" onclick="append('/')">÷</button>
+        <button onclick="add('1')">1</button>
+        <button onclick="add('2')">2</button>
+        <button onclick="add('3')">3</button>
+        <button class="btn-op" onclick="add('/')">÷</button>
         
-        <button onclick="append('0')">0</button>
-        <button onclick="append('.')">.</button>
-        <button onclick="append('pi')">π</button>
-        <button class="btn-op" onclick="append('+')">+</button>
-        
-        <button onclick="append('(')">(</button>
-        <button onclick="append(')')">)</button>
-        <button class="btn-equal" onclick="compute()">=</button>
+        <button onclick="add('0')">0</button>
+        <button onclick="add('.')">.</button>
+        <button onclick="add('(')">(</button>
+        <button onclick="add(')')">)</button>
+
+        <button class="btn-op" onclick="add('+')">+</button>
+        <button class="btn-op" onclick="add('-')">−</button>
+        <button class="btn-equal" onclick="calculate()">=</button>
     </div>
 </div>
 
 <script>
-    const screen = document.getElementById('screen');
+    const display = document.getElementById('display');
 
-    function append(val) {
-        screen.value += val;
+    function add(value) {
+        display.value += value;
+        display.scrollLeft = display.scrollWidth;
     }
 
-    function clearScreen() {
-        screen.value = '';
+    function clearDisplay() {
+        display.value = '';
     }
 
-    function compute() {
+    function calculate() {
         try {
-            // El motor math.js procesa la cadena como una expresión simbólica
-            const result = math.evaluate(screen.value);
-            screen.value = math.format(result, { precision: 14 });
-        } catch (error) {
-            screen.value = "Syntax Error";
-            setTimeout(clearScreen, 1500);
+            const result = math.evaluate(display.value);
+            // Formateo para evitar errores de coma flotante IEEE 754
+            display.value = math.format(result, { precision: 12 });
+        } catch (e) {
+            display.value = "Error de Sintaxis";
+            setTimeout(clearDisplay, 1200);
         }
     }
-</script>
 
+    // Registro del Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Engine: Activo'))
+                .catch(err => console.error('Engine: Fallo', err));
+        });
+    }
+</script>
 </body>
 </html>
