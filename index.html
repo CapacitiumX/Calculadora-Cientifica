@@ -5,18 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Scientific Computing Pro</title>
 
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Scientific Calculator","short_name":"SciCalc","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#0ea5e9","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/5348/5348365.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
-    
-    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5348/5348365.png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5348/5348365.png">
+
+    <script>
+        // MANIFIESTO DINÁMICO PARA INSTALACIÓN
+        const manifest = {
+            "name": "Scientific Calculator Pro",
+            "short_name": "SciCalc",
+            "start_url": "./",
+            "display": "standalone",
+            "background_color": "#0f172a",
+            "theme_color": "#0ea5e9",
+            "icons": [{
+                "src": "https://cdn-icons-png.flaticon.com/512/5348/5348365.png",
+                "sizes": "512x512",
+                "type": "image/png",
+                "purpose": "any maskable"
+            }]
+        };
+        const stringManifest = JSON.stringify(manifest);
+        const blob = new Blob([stringManifest], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(blob);
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = manifestURL;
+        document.head.appendChild(link);
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
 
     <style>
         :root { --bg: #0f172a; --panel: #1e293b; --accent: #38bdf8; --text: #f8fafc; --op: #0ea5e9; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
         
         .calc-app { background: var(--panel); padding: 1.5rem; border-radius: 2rem; width: 100%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
         
@@ -24,7 +49,7 @@
         
         .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
         
-        button { padding: 20px 5px; border: none; border-radius: 1rem; background: #334155; color: white; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.1s ease; }
+        button { padding: 18px 5px; border: none; border-radius: 1rem; background: #334155; color: white; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.1s ease; }
         button:active { transform: scale(0.92); background: #475569; }
         
         .btn-sci { background: #1e293b; color: var(--accent); font-size: 0.9rem; border: 1px solid rgba(56, 189, 248, 0.2); }
@@ -87,16 +112,16 @@
         }
     }
 
-    // Lógica del Service Worker integrada mediante Blob
+    // Registro de Service Worker para funcionamiento Offline
     const swCode = `
         self.addEventListener('install', e => self.skipWaiting());
         self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));
     `;
-    const blob = new Blob([swCode], { type: 'text/javascript' });
-    const swUrl = URL.createObjectURL(blob);
+    const swBlob = new Blob([swCode], { type: 'text/javascript' });
+    const swUrl = URL.createObjectURL(swBlob);
 
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register(swUrl).then(() => console.log("PWA Engine Ready"));
+        navigator.serviceWorker.register(swUrl);
     }
 </script>
 </body>
